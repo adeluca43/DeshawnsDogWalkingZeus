@@ -20,6 +20,18 @@ List <Dog> dogs = new List<Dog>(){
         Name = "Athena",
         CityId = 3,
         WalkerId = 3
+    },
+    new Dog() {
+        Id = 4,
+        Name = "Cerberus",
+        CityId = 4,
+        WalkerId = 4
+    },
+    new Dog(){
+        Id = 5,
+        Name = "Hermes",
+        CityId = 5,
+        WalkerId = 5
     }
 };
 
@@ -35,6 +47,14 @@ List <City> cities = new List<City>(){
     new City() {
         Id = 3,
         Name = "Brentwood"
+    },
+    new City() {
+        Id = 4,
+        Name = "Antioch"
+    },
+    new City() {
+        Id = 5,
+        Name = "Murfreesboro"
     }
 };
 
@@ -42,7 +62,7 @@ List <Walker> walkers = new List<Walker>() {
     new Walker() {
         Id = 1,
         Name = "Ezekiel",
-        Cities = new List<int>{ 1 }
+        Cities = new List<int>{ 1, 4 }
     },
     new Walker() {
         Id = 2,
@@ -52,7 +72,17 @@ List <Walker> walkers = new List<Walker>() {
     new Walker() {
         Id = 3,
         Name = "Gabriel",
-        Cities = new List<int>{ 3 }
+        Cities = new List<int>{ 3, 5 }
+    },
+    new Walker() {
+        Id = 4,
+        Name = "Lazarus",
+        Cities = new List<int>{ 4, 3 }
+    },
+    new Walker() {
+        Id = 5,
+        Name = "Mary",
+        Cities = new List<int>{ 2, 5 }
     }
 };
 
@@ -122,6 +152,27 @@ app.MapPost("/api/dogs", (Dog dogObj) => {
         WalkerId = dogObj.WalkerId
     });
 
+});
+
+app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) => {
+    
+    //if the client did not provide a valid dog object
+    if(dogObj == null)
+    {
+        return Results.BadRequest(); 
+    }
+
+    //find the id based on the one put into the parameter
+    Dog foundDog = dogs.FirstOrDefault(d => d.Id == id);
+
+    foundDog.WalkerId = dogObj.WalkerId;
+
+    return Results.Ok(new DogDTO {
+        Id = foundDog.Id,
+        Name = foundDog.Name,
+        CityId = foundDog.CityId,
+        WalkerId = foundDog.WalkerId
+    });
 });
 
 app.Run();
