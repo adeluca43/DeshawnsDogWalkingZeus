@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using DeShawnsDogWalkingZeus.Models;
 using DeShawnsDogWalkingZeus.Models.DTO;
 
-List <Dog> dogs = new List<Dog>(){
+List<Dog> dogs = new List<Dog>(){
     new Dog() {
         Id = 1,
         Name = "Hera",
@@ -35,7 +35,7 @@ List <Dog> dogs = new List<Dog>(){
     }
 };
 
-List <City> cities = new List<City>(){
+List<City> cities = new List<City>(){
     new City() {
         Id = 1,
         Name = "Nashville"
@@ -58,7 +58,7 @@ List <City> cities = new List<City>(){
     }
 };
 
-List <Walker> walkers = new List<Walker>() {
+List<Walker> walkers = new List<Walker>() {
     new Walker() {
         Id = 1,
         Name = "Ezekiel",
@@ -109,8 +109,10 @@ app.MapGet("/api/hello", () =>
     return new { Message = "Welcome to DeShawn's Dog Walking" };
 });
 
-app.MapGet("/api/dogs", () => {
-    return dogs.Select(d => new DogDTO{
+app.MapGet("/api/dogs", () =>
+{
+    return dogs.Select(d => new DogDTO
+    {
         Id = d.Id,
         Name = d.Name,
         CityId = d.CityId,
@@ -118,34 +120,40 @@ app.MapGet("/api/dogs", () => {
     });
 });
 
-app.MapGet("/api/cities", () => {
-    return cities.Select(c => new CityDTO{
+app.MapGet("/api/cities", () =>
+{
+    return cities.Select(c => new CityDTO
+    {
         Id = c.Id,
         Name = c.Name
     });
 });
 
-app.MapGet("/api/walkers", () => {
-    return walkers.Select(w => new WalkerDTO{
+app.MapGet("/api/walkers", () =>
+{
+    return walkers.Select(w => new WalkerDTO
+    {
         Id = w.Id,
         Name = w.Name,
         Cities = w.Cities
     });
 });
 
-app.MapPost("/api/dogs", (Dog dogObj) => {
+app.MapPost("/api/dogs", (Dog dogObj) =>
+{
 
-//if the client did not provide a valid dog object
-    if(dogObj == null)
+    //if the client did not provide a valid dog object
+    if (dogObj == null)
     {
-        return Results.BadRequest(); 
+        return Results.BadRequest();
     }
 
-//create a new id
+    //create a new id
     dogObj.Id = dogs.Max(d => d.Id) + 1;
     dogs.Add(dogObj);
 
-    return Results.Created($"/api/dogs/{dogObj.Id}", new DogDTO {
+    return Results.Created($"/api/dogs/{dogObj.Id}", new DogDTO
+    {
         Id = dogObj.Id,
         Name = dogObj.Name,
         CityId = dogObj.CityId,
@@ -154,12 +162,13 @@ app.MapPost("/api/dogs", (Dog dogObj) => {
 
 });
 
-app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) => {
-    
+app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) =>
+{
+
     //if the client did not provide a valid dog object
-    if(dogObj == null)
+    if (dogObj == null)
     {
-        return Results.BadRequest(); 
+        return Results.BadRequest();
     }
 
     //find the id based on the one put into the parameter
@@ -167,12 +176,25 @@ app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) => {
 
     foundDog.WalkerId = dogObj.WalkerId;
 
-    return Results.Ok(new DogDTO {
+    return Results.Ok(new DogDTO
+    {
         Id = foundDog.Id,
         Name = foundDog.Name,
         CityId = foundDog.CityId,
         WalkerId = foundDog.WalkerId
     });
 });
+
+app.MapPost("/api/cities", (City city) =>
+{
+    city.Id = cities.Max(c => c.Id) + 1;
+    cities.Add(city);
+    return Results.Created($"/api/cities/{city.Id}", new CityDTO
+    {
+        Id = city.Id,
+        Name = city.Name
+    });
+});
+
 
 app.Run();

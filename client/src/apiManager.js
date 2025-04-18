@@ -52,3 +52,13 @@ export const putDog = async (dog, walker) => {
   const response = await fetch(`/api/dogs/${dog.id}`, putOptions)
   return await response.json()
 }
+
+export const addCity = async (newCity) => {
+  const response = await fetch("/api/cities/",{
+    method:"POST",
+    headers: { "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newCity),
+  });
+  return response;
+}
