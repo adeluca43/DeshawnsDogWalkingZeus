@@ -1,5 +1,6 @@
 import { getDogs, getGreeting } from "./apiManager";
 import { useEffect, useState } from "react";
+import { Link} from "react-router-dom";
 
 export default function Home() {
   const [greeting, setGreeting] = useState({
@@ -24,7 +25,8 @@ export default function Home() {
   <p>{greeting.message}</p>
   <ul className="dogs-list">
     {dogs.map((dog) => {
-      return <li key={dog.id}>{dog.name}</li>
+      return <li key={dog.id}>
+        <Link to={`/dogs/${dog.id}`}>{dog.name} </Link> </li> 
     })}
   </ul>
   </>);
