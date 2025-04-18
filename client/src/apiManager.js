@@ -35,3 +35,20 @@ export const postDog = async (dog) => {
   const data = await response.json()
   return data.id
 }
+
+export const putDog = async (dog, walker) => {
+  
+  const dogToPut = {
+    ...dog,
+    walkerId: walker
+  }
+  const putOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dogToPut)
+  }
+  const response = await fetch(`/api/dogs/${dog.id}`, putOptions)
+  return await response.json()
+}
