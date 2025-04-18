@@ -103,4 +103,25 @@ app.MapGet("/api/walkers", () => {
     });
 });
 
+app.MapPost("/api/dogs", (Dog dogObj) => {
+
+//if the client did not provide a valid dog object
+    if(dogObj == null)
+    {
+        return Results.BadRequest(); 
+    }
+
+//create a new id
+    dogObj.Id = dogs.Max(d => d.Id) + 1;
+    dogs.Add(dogObj);
+
+    return Results.Created($"/api/dogs/{dogObj.Id}", new DogDTO {
+        Id = dogObj.Id,
+        Name = dogObj.Name,
+        CityId = dogObj.CityId,
+        WalkerId = dogObj.WalkerId
+    });
+
+});
+
 app.Run();

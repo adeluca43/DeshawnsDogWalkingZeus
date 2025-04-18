@@ -18,7 +18,6 @@ export default function Home() {
 
   useEffect(() => {
     getDogs().then(setDogs)
-    console.log("dogs populated")
   }, [])
 
   return (<>
@@ -28,6 +27,7 @@ export default function Home() {
       return <li key={dog.id}>
         <Link to={`/dogs/${dog.id}`}>{dog.name} </Link> </li> 
     })}
+    <li><Link to={`/dogs/adddog`}><button type="button">Add Dog</button></Link></li>
   </ul>
   </>);
 }
