@@ -1,31 +1,38 @@
 import { useEffect,useState } from "react";
-import { getWalkers,getCities, getDogs, putDog } from "../apiManager";
+import { getWalkers,getCities, getDogs, putDog, getWalkerCities } from "../apiManager";
 import { Link } from "react-router-dom";
 
 
 export const Walkers = () => {
+const [ allWalkers, setAllWalkers ] = useState([])
 const [ walkers, setWalkers] =useState ([]);
 const [ cities, setCities] =useState ([]);
 const [ dogs, setDogs] = useState([]);
 const [ selectedCityId, setSelectedCityId] = useState (0);
-const [dropdownId, setDropdownId] = useState(null)
+const [ walkerCities, setWalkerCities ] = useState([])
+const [ dropdownId, setDropdownId ] = useState(null)
 
 
 useEffect (() => {
+    getWalkers().then(setAllWalkers)
     getWalkers().then(setWalkers)
     getCities().then(setCities)
     getDogs().then(setDogs)
+    getWalkerCities().then(setWalkerCities)
 }, []);
 
-let filterByCity;
 
-if (selectedCityId === 0) {
-    filterByCity = walkers
-} else {
-    filterByCity = walkers.filter((walker) => {
-       return  walker.cities.includes(selectedCityId)
-    })
-}
+useEffect(() => {
+    if (selectedCityId === 0) {
+        setWalkers(allWalkers)
+    } else {
+        //filter the walker cities to match the selected city and the walkers in it
+        const tempFilter = walkerCities.filter(wc => wc.cityId === selectedCityId).map(wc => wc.walkerId)
+
+        const matchedWalkers = allWalkers.filter(walker => tempFilter.includes(walker.id))
+        setWalkers(matchedWalkers)
+    }
+}, [selectedCityId, walkerCities, allWalkers])
 
 const toggleDropdown = (walkerId) => {
     setDropdownId((id) => (id === walkerId ? null : walkerId))
@@ -34,9 +41,10 @@ const toggleDropdown = (walkerId) => {
     return ( 
         <div>
             <h2> List of Walkers</h2>
-            <ul className = "walkers-list">
-                {filterByCity.map((walker) => {
-                    return <li key={walker.id} className="walker-list-item">{walker.name} 
+            <ul className = "walkers-list" key={walkers.id}>
+                {walkers.map((walker) => {
+                    return <li key={walker.id} className="walker-list-item">
+                        <Link to={`/walkers/${walker.id}`}>{walker.name} </Link>
                     <button type="button" onClick={() => toggleDropdown(walker.id)} className="walker-add-dog-button">Add Dog</button>
                     {dropdownId === walker.id && (<div className="dog-dropdown-list">
                         {dogs.filter((dog) => 
