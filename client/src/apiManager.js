@@ -1,3 +1,5 @@
+import { Cities } from "./cities/Cities";
+
 export const getGreeting = async () => {
   const res = await fetch("/api/hello");
   return res.json();
@@ -15,6 +17,10 @@ export const getWalkers = async () => {
 
 export const getCities = async () => {
   const res = await fetch("/api/cities");
+  return res.json();
+}
+export const getWalkerCities = async () => {
+  const res = await fetch("/api/walkercities");
   return res.json();
 }
 
@@ -36,6 +42,16 @@ export const postDog = async (dog) => {
   return data.id
 }
 
+export const addCity = async (newCity) => {
+  const response = await fetch("/api/cities/",{
+    method:"POST",
+    headers: { "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newCity),
+  });
+  return response;
+}
+
 export const putDog = async (dog, walker) => {
   
   const dogToPut = {
@@ -53,12 +69,29 @@ export const putDog = async (dog, walker) => {
   return await response.json()
 }
 
-export const addCity = async (newCity) => {
-  const response = await fetch("/api/cities/",{
-    method:"POST",
-    headers: { "Content-Type": "application/json"
+export const putWalker = async (id, walker) => {
+  const putOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(newCity),
-  });
-  return response;
+    body: JSON.stringify({
+      name: walker.name
+    })
+  }
+  const response = await fetch(`/api/walkers/${id}`, putOptions)
+  const data = await response.json()
+  return data.id
+}
+
+export const postWalkerCity = async (walkerCity) => {
+  const postOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({walkerCity})
+  }
+  const response = await fetch(`/api/walkercities/`, postOptions)
+  return await response.json()
 }

@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using DeShawnsDogWalkingZeus.Models;
 using DeShawnsDogWalkingZeus.Models.DTO;
+using Microsoft.AspNetCore.Routing.Constraints;
 
 List<Dog> dogs = new List<Dog>(){
     new Dog() {
@@ -61,28 +62,76 @@ List<City> cities = new List<City>(){
 List<Walker> walkers = new List<Walker>() {
     new Walker() {
         Id = 1,
-        Name = "Ezekiel",
-        Cities = new List<int>{ 1, 4 }
+        Name = "Ezekiel"
     },
     new Walker() {
         Id = 2,
-        Name = "Jebediah",
-        Cities = new List<int>{ 1, 2 }
+        Name = "Jebediah"
     },
     new Walker() {
         Id = 3,
-        Name = "Gabriel",
-        Cities = new List<int>{ 3, 5 }
+        Name = "Gabriel"
     },
     new Walker() {
         Id = 4,
-        Name = "Lazarus",
-        Cities = new List<int>{ 4, 3 }
+        Name = "Lazarus"
     },
     new Walker() {
         Id = 5,
-        Name = "Mary",
-        Cities = new List<int>{ 2, 5 }
+        Name = "Mary"
+    }
+};
+
+List<WalkerCity> walkerCities = new List<WalkerCity>(){
+    new WalkerCity(){
+        Id = 1,
+        CityId = 1,
+        WalkerId = 1
+    },
+    new WalkerCity(){
+        Id = 2,
+        CityId = 1,
+        WalkerId = 4
+    },
+    new WalkerCity(){
+        Id = 3,
+        CityId = 2,
+        WalkerId = 2
+    },
+    new WalkerCity(){
+        Id = 4,
+        CityId = 2,
+        WalkerId = 5
+    },
+    new WalkerCity(){
+        Id = 5,
+        CityId = 3,
+        WalkerId = 3
+    },
+    new WalkerCity(){
+        Id = 6,
+        CityId = 3,
+        WalkerId = 1
+    },
+    new WalkerCity(){
+        Id = 7,
+        CityId = 4,
+        WalkerId = 4
+    },
+    new WalkerCity(){
+        Id = 8,
+        CityId = 4,
+        WalkerId = 2
+    },
+    new WalkerCity(){
+        Id = 9,
+        CityId = 5,
+        WalkerId = 5
+    },
+    new WalkerCity(){
+        Id = 10,
+        CityId = 5,
+        WalkerId = 3
     }
 };
 
@@ -129,13 +178,23 @@ app.MapGet("/api/cities", () =>
     });
 });
 
-app.MapGet("/api/walkers", () =>
+app.MapGet("/api/walkers/", () =>
 {
     return walkers.Select(w => new WalkerDTO
     {
         Id = w.Id,
-        Name = w.Name,
-        Cities = w.Cities
+        Name = w.Name
+    });
+});
+
+app.MapGet("/api/walkercities", () =>
+{
+    return walkerCities.Select(wc => new WalkerCityDTO
+    {
+        Id = wc.Id,
+        WalkerId = wc.WalkerId,
+        CityId = wc.CityId
+
     });
 });
 
@@ -158,6 +217,43 @@ app.MapPost("/api/dogs", (Dog dogObj) =>
         Name = dogObj.Name,
         CityId = dogObj.CityId,
         WalkerId = dogObj.WalkerId
+    });
+
+});
+
+app.MapPost("/api/cities", (City city) =>
+{
+    city.Id = cities.Max(c => c.Id) + 1;
+    cities.Add(city);
+    return Results.Created($"/api/cities/{city.Id}", new CityDTO
+    {
+        Id = city.Id,
+        Name = city.Name
+    });
+});
+
+app.MapPost("/api/walkercities", (WalkerCity walkerCity) => {
+    //if the client did not provide a valid walkercity object
+    if (walkerCity == null)
+    {
+        return Results.BadRequest();
+    }
+
+    //if the relationship already exists, throw a conflict error
+    if (walkerCities.Any(wc => wc.WalkerId == walkerCity.WalkerId && wc.CityId == walkerCity.CityId))
+    {
+        return Results.Conflict("This walker-city relationship already exists.");
+    }
+
+    //create a new id
+    walkerCity.Id = walkerCities.Max(wc => wc.Id) + 1;
+    walkerCities.Add(walkerCity);
+
+        return Results.Created($"/api/walkercities/{walkerCity.Id}", new WalkerCityDTO
+    {
+        Id = walkerCity.Id,
+        CityId = walkerCity.CityId,
+        WalkerId = walkerCity.WalkerId
     });
 
 });
@@ -185,16 +281,21 @@ app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) =>
     });
 });
 
-app.MapPost("/api/cities", (City city) =>
-{
-    city.Id = cities.Max(c => c.Id) + 1;
-    cities.Add(city);
-    return Results.Created($"/api/cities/{city.Id}", new CityDTO
-    {
-        Id = city.Id,
-        Name = city.Name
-    });
-});
+app.MapPut("/api/walkers/{id}", (int id, Walker walkerObj) => {
 
+    //if the client did not provide a valid walker object
+    if (walkerObj == null)
+    {
+        return Results.BadRequest();
+    }
+
+    Walker foundWalker = walkers.FirstOrDefault(w => w.Id == id);
+
+    return Results.Ok(new WalkerDTO{
+        Id = foundWalker.Id,
+        Name = foundWalker.Name
+    });
+
+});
 
 app.Run();
