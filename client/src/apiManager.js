@@ -1,4 +1,4 @@
-import { Cities } from "./cities/Cities";
+
 
 export const getGreeting = async () => {
   const res = await fetch("/api/hello");
@@ -90,8 +90,22 @@ export const postWalkerCity = async (walkerCity) => {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({walkerCity})
-  }
+    body: JSON.stringify(walkerCity)
+  };
   const response = await fetch(`/api/walkercities/`, postOptions)
   return await response.json()
 }
+
+export const deleteDog = async (id) => {
+  const response = await fetch(`/api/dogs/${id}`, {
+    method: "DELETE",
+  });
+  return response;
+};
+
+export const deleteWalker = async (id) => {
+  const response = await fetch(`/api/walkers/${id}`, {
+    method: "DELETE",
+  });
+  return response;
+};

@@ -2,8 +2,10 @@ import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { getCities, getWalkers, getWalkerCities, putWalker, postWalkerCity } from "../apiManager"
 import { Form, Button } from "react-bootstrap"
+import { useNavigate } from "react-router-dom"
 
 export const EditWalker = () => {
+    const navigate = useNavigate();
     const [walker, setWalker] = useState({})
     const [allWalkers, setAllWalkers] = useState([])
     const [allCities, setAllCities] = useState([])
@@ -86,6 +88,7 @@ export const EditWalker = () => {
     console.log("Updated walker:", walker);
     console.log("Newly posted walkerCities:", newWalkerCities);
 
+    navigate("/walkers");
     }
 
     const handleClicked = (eventTrigger, cityId) => {
