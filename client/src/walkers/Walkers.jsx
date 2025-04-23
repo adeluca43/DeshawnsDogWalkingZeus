@@ -1,5 +1,5 @@
 import { useEffect,useState } from "react";
-import { getWalkers,getCities, getDogs, putDog, getWalkerCities } from "../apiManager";
+import { getWalkers,getCities, getDogs, putDog, getWalkerCities,deleteWalker } from "../apiManager";
 import { Link } from "react-router-dom";
 
 
@@ -46,6 +46,22 @@ const toggleDropdown = (walkerId) => {
                     return <li key={walker.id} className="walker-list-item">
                         <Link to={`/walkers/${walker.id}`}>{walker.name} </Link>
                     <button type="button" onClick={() => toggleDropdown(walker.id)} className="walker-add-dog-button">Add Dog</button>
+                    <button
+      className="walker-remove-button"
+      onClick={async () => {
+        const confirm = window.confirm("Are you sure you want to remove this walker?");
+        if (confirm) {
+          await deleteWalker(walker.id);
+          const updatedWalkers = await getWalkers();
+          setAllWalkers(updatedWalkers);
+          setWalkers(updatedWalkers); // refresh the filtered list
+          const updatedDogs = await getDogs();
+          setDogs(updatedDogs); // refresh dogs so unassigned ones show up correctly
+        }
+      }}
+    >
+      Remove
+    </button>
                     {dropdownId === walker.id && (<div className="dog-dropdown-list">
                         {dogs.filter((dog) => 
                         walker.cities.includes(dog.cityId) && dog.walkerId !== walker.id).map((dog) => (

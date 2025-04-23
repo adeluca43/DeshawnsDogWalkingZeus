@@ -232,7 +232,8 @@ app.MapPost("/api/cities", (City city) =>
     });
 });
 
-app.MapPost("/api/walkercities", (WalkerCity walkerCity) => {
+app.MapPost("/api/walkercities", (WalkerCity walkerCity) =>
+{
     //if the client did not provide a valid walkercity object
     if (walkerCity == null)
     {
@@ -249,7 +250,7 @@ app.MapPost("/api/walkercities", (WalkerCity walkerCity) => {
     walkerCity.Id = walkerCities.Max(wc => wc.Id) + 1;
     walkerCities.Add(walkerCity);
 
-        return Results.Created($"/api/walkercities/{walkerCity.Id}", new WalkerCityDTO
+    return Results.Created($"/api/walkercities/{walkerCity.Id}", new WalkerCityDTO
     {
         Id = walkerCity.Id,
         CityId = walkerCity.CityId,
@@ -281,7 +282,8 @@ app.MapPut("/api/dogs/{id}", (int id, Dog dogObj) =>
     });
 });
 
-app.MapPut("/api/walkers/{id}", (int id, Walker walkerObj) => {
+app.MapPut("/api/walkers/{id}", (int id, Walker walkerObj) =>
+{
 
     //if the client did not provide a valid walker object
     if (walkerObj == null)
@@ -291,11 +293,52 @@ app.MapPut("/api/walkers/{id}", (int id, Walker walkerObj) => {
 
     Walker foundWalker = walkers.FirstOrDefault(w => w.Id == id);
 
-    return Results.Ok(new WalkerDTO{
+    return Results.Ok(new WalkerDTO
+    {
         Id = foundWalker.Id,
         Name = foundWalker.Name
     });
 
 });
+app.MapDelete("/api/dogs/{id}", (int id) =>
+{
+    Dog dogToDelete = dogs.FirstOrDefault(d => d.Id == id);
+
+    if (dogToDelete == null)
+    {
+        return Results.NotFound();
+    }
+
+    dogs.Remove(dogToDelete);
+    return Results.NoContent(); // 204
+});
+
+app.MapDelete("/api/walkers/{id}", (int id) =>
+{
+    var walkerToDelete = walkers.FirstOrDefault(w => w.Id == id);
+    if (walkerToDelete == null)
+    {
+        return Results.NotFound();
+    }
+
+    // Remove the walker
+    walkers.Remove(walkerToDelete);
+
+    foreach (var dog in dogs)
+    {
+        if (dog.WalkerId == id)
+        {
+            dog.WalkerId = 0;
+        }
+    }
+
+    // Remove walker-city relationships
+    walkerCities.RemoveAll(wc => wc.WalkerId == id);
+
+    return Results.NoContent(); // 204 success
+});
+
+
+
 
 app.Run();
